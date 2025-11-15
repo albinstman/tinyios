@@ -1,22 +1,33 @@
-# Pick which go-ios version/commit/tag to build (defaults to main)
-ARG GO_IOS_VERSION=v1.0.182
+# syntax=docker/dockerfile:1.7
 
-# --- builder ---
-FROM golang:1.22 AS builder
-ARG GO_IOS_VERSION
-WORKDIR /src
 
-# Checkout the exact version
-RUN git clone --depth 1 --branch ${GO_IOS_VERSION} https://github.com/danielpaulus/go-ios.git .
+FROM --platform=$BUILDPLATFORM golang:1.25.1-alpine AS builder
+ENV GOWORK=off
+# These are automatically set by BuildKit when you use --platform
+ARG TARGETOS
+ARG TARGETARCH
 
-# Build the REST API after generating Swagger docs (creates ./restapi/docs)
-WORKDIR /src/restapi
-RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
-RUN /go/bin/swag init --parseDependency
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/go-ios-restapi .
+WORKDIR /app
 
-# --- runtime ---
-FROM gcr.io/distroless/base-debian12
-COPY --from=builder /out/go-ios-restapi /usr/local/bin/go-ios-restapi
+COPY go.mod go.sum go-ios ./
+RUN go mod download
+
+COPY . .
+
+# Build *for the target platform*, not the build platform
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -o server .
+
+########################
+# 2) Run stage
+########################
+# Use a base image that has variants for all platforms you care about
+FROM alpine:3.22.2
+ENV GOWORK=off
+
+WORKDIR /app
+COPY --from=builder /app/server .
+
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/go-ios-restapi"]
+ENTRYPOINT ["./server"]
+
