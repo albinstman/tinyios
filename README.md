@@ -5,5 +5,5 @@ It exposes itself as a HTTP server so it can be accessed from anywhere. It is al
 tinyios depends on usbmuxd installed on the host machine to manage device pairing and device communication through usb or wifi. You will also need to make usbmuxd on the host available inside the container.
 
 Permissions and privileges:
-Stateless: No tunnel manager or file system access
-Rootless: No root access
+- Stateless: No tunnel manager
+- Rootless: No root access
