@@ -88,28 +88,6 @@ The main purpose of tinyios is to setup ios devices and then talk to them via ap
 
 ----
 
-# tinyios
-  
-
-## Informations
-
-### Version
-
-0.0.1
-
-  
-
-## Content negotiation
-
-### URI Schemes
-  * http
-
-### Consumes
-  * application/json
-
-### Produces
-  * application/json
-
 ## All endpoints
 
 ###  activation
