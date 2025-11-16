@@ -21,21 +21,20 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
     To use tinyios on Linux or WSL you need to install usbmuxd to handle device pairing and device communication. You can run these commands to install or update existing usbmuxd to the latest version
 
     ```
-    $ git clone https://github.com/libimobiledevice/usbmuxd.git
-    $ cd usbmuxd
-    $ ./autogen.sh
-    $ make
-    $ sudo make install
+    git clone https://github.com/libimobiledevice/usbmuxd.git
+    cd usbmuxd
+    ./autogen.sh
+    make
+    sudo make install
     ```
     You will also need socat to make usbmuxd available from the host to container
     ```
-    $ sudo apt install socat
-    $ sudo socat TCP-LISTEN:27015,bind=127.0.0.1,reuseaddr,fork \
-     UNIX-CONNECT:/var/run/usbmuxd
+    sudo apt install socat
+    sudo socat TCP-LISTEN:27015,reuseaddr,fork UNIX-CONNECT:/var/run/usbmuxd
     ```
 3. Run latest container image on port 8080
     ```
-    $ docker run —rm \
+    docker run —rm \
     -p 8080:80 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
@@ -48,20 +47,20 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
     To use tinyios on Linux or WSL you need to install usbmuxd to handle device pairing and device communication. You can run these commands to install or update existing usbmuxd to the latest version
 
     ```
-    $ git clone https://github.com/libimobiledevice/usbmuxd.git
-    $ cd usbmuxd
-    $ ./autogen.sh
-    $ make
-    $ sudo make install
+    git clone https://github.com/libimobiledevice/usbmuxd.git
+    cd usbmuxd
+    ./autogen.sh
+    make
+    sudo make install
     ```
     You will also need socat to make usbmuxd available from the host to container
     ```
-    $ sudo apt install socat
-    $ sudo socat TCP-LISTEN:27015,reuseaddr,fork UNIX-CONNECT:/var/run/usbmuxd
+    sudo apt install socat
+    sudo socat TCP-LISTEN:27015,reuseaddr,fork UNIX-CONNECT:/var/run/usbmuxd
     ```
 2. Run latest container image on port 8080
     ```
-    $ docker run —rm \
+    docker run —rm \
     -p 8080:80 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
@@ -71,12 +70,12 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
 
 1. Make usbmuxd available for container
     ```
-    $ brew install socat
-    $ socat TCP-LISTEN:27015,reuseaddr,fork UNIX-CONNECT:/var/run/usbmuxd
+    brew install socat
+    socat TCP-LISTEN:27015,reuseaddr,fork UNIX-CONNECT:/var/run/usbmuxd
     ```
 2. Run latest container image on port 8080
     ```
-    $ docker run —rm \
+    docker run —rm \
     -p 8080:80 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
