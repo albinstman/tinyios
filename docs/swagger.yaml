@@ -1,4 +1,24 @@
 definitions:
+  main.Device:
+    properties:
+      ConnectionType:
+        type: string
+      ProductName:
+        type: string
+      ProductType:
+        type: string
+      ProductVersion:
+        type: string
+      Udid:
+        type: string
+    type: object
+  main.DevicesResponse:
+    properties:
+      devices:
+        items:
+          $ref: '#/definitions/main.Device'
+        type: array
+    type: object
   main.GenericResponse:
     properties:
       ok:
@@ -438,4 +458,17 @@ paths:
       summary: Run WebDriverAgent
       tags:
       - wda
+  /devices:
+    get:
+      description: Returns a list of all connected iOS devices
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DevicesResponse'
+      summary: List devices
+      tags:
+      - device
 swagger: "2.0"

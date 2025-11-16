@@ -15,6 +15,26 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/devices": {
+            "get": {
+                "description": "Returns a list of all connected iOS devices",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "device"
+                ],
+                "summary": "List devices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DevicesResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/{udid}/activate/enable": {
             "post": {
                 "description": "Activates the specified iOS device",
@@ -662,6 +682,37 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.Device": {
+            "type": "object",
+            "properties": {
+                "ConnectionType": {
+                    "type": "string"
+                },
+                "ProductName": {
+                    "type": "string"
+                },
+                "ProductType": {
+                    "type": "string"
+                },
+                "ProductVersion": {
+                    "type": "string"
+                },
+                "Udid": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.DevicesResponse": {
+            "type": "object",
+            "properties": {
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Device"
+                    }
+                }
+            }
+        },
         "main.GenericResponse": {
             "type": "object",
             "properties": {

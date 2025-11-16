@@ -100,6 +100,18 @@ func writeResponse(w http.ResponseWriter, data []byte) {
 	w.Write(data)
 }
 
+// devices godoc
+// @Summary      List devices
+// @Description  Returns a list of all connected iOS devices
+// @Tags         device
+// @Produce      json
+// @Success      200 {object} DevicesResponse
+// @Router       /devices [get]
+func devices(w http.ResponseWriter, _ *http.Request) {
+	devices := []byte(tiny.DeviceList())
+	w.Write(devices)
+}
+
 // reboot godoc
 // @Summary      Reboot device
 // @Description  Reboots the specified iOS device
@@ -446,11 +458,7 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 
 func main() {
 	root := http.NewServeMux()
-	root.HandleFunc("GET /devices", func(w http.ResponseWriter, r *http.Request) {
-		devices := []byte(tiny.DeviceList())
-		fmt.Println("Devices requested")
-		w.Write(devices)
-	})
+	root.HandleFunc("GET /devices", devices)
 
 	deviceMux := http.NewServeMux()
 	deviceMux.HandleFunc("POST /{udid}/reboot", reboot)
