@@ -231,7 +231,6 @@ func AppInstall(device ios.DeviceEntry, path string) string {
 }
 
 func Processes(device ios.DeviceEntry) string {
-	fmt.Println("1")
 	service, err := instruments.NewDeviceInfoService(device)
 	if err != nil {
 		return convertToJSONString(map[string][]any{
@@ -378,7 +377,6 @@ func WdaRun(device ios.DeviceEntry) string {
 }
 
 func WdaKill(device ios.DeviceEntry) string {
-
 	session, loaded := globalSessions.Load(device.Properties.SerialNumber)
 	if !loaded {
 		return convertToJSONString(map[string]bool{"ok": false})

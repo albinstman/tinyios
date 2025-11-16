@@ -221,7 +221,6 @@ func ConnectToServiceTunnelIfaceMockPtr(device *DeviceEntry, serviceName string)
 
 func ConnectToServiceTunnelIfaceMock(device DeviceEntry, serviceName string) (DeviceConnectionInterface, error) {
 	if device.Rsd != nil {
-		fmt.Printf("AAAAAAAAAA %s\n", device.Properties.SerialNumber)
 		sport := device.Rsd.GetPort(serviceName)
 		sconn, err := device.USInterface.TunnelInterface(net.ParseIP(device.Address), uint16(sport))
 		if err != nil {
