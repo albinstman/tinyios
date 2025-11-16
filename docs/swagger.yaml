@@ -1,0 +1,441 @@
+definitions:
+  main.GenericResponse:
+    properties:
+      ok:
+        type: boolean
+    type: object
+  main.ProfilleAddRequset:
+    properties:
+      b64profile:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: tinyios
+  version: 0.0.1
+paths:
+  /{udid}/activate/enable:
+    post:
+      description: Activates the specified iOS device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Enable activation
+      tags:
+      - activation
+  /{udid}/activated:
+    get:
+      description: Returns whether the device is activated
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Check activation status
+      tags:
+      - activation
+  /{udid}/apps/install:
+    post:
+      description: Installs an application from a URL on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      - description: Application IPA URL
+        in: formData
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Install application
+      tags:
+      - apps
+  /{udid}/apps/kill:
+    post:
+      description: Terminates a running application by process ID
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      - description: Process ID
+        in: formData
+        name: pid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Kill application
+      tags:
+      - apps
+  /{udid}/apps/list:
+    get:
+      description: Returns a list of applications installed on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: List applications
+      tags:
+      - apps
+  /{udid}/apps/run:
+    post:
+      description: Launches an application on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      - description: Application bundle identifier
+        in: formData
+        name: bundleid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Run application
+      tags:
+      - apps
+  /{udid}/devmode:
+    get:
+      description: Returns whether developer mode is enabled on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Check developer mode status
+      tags:
+      - developer
+  /{udid}/devmode/enable:
+    post:
+      description: Enables developer mode on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Enable developer mode
+      tags:
+      - developer
+  /{udid}/erase:
+    post:
+      description: Erases all content and settings from the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Erase device
+      tags:
+      - device
+  /{udid}/image:
+    get:
+      description: Returns whether the developer disk image is mounted
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Check developer disk image status
+      tags:
+      - developer
+  /{udid}/image/enable:
+    post:
+      description: Mounts the developer disk image on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Mount developer disk image
+      tags:
+      - developer
+  /{udid}/pair/enable:
+    post:
+      description: Pairs the device using the provided certificate
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Enable pairing
+      tags:
+      - pairing
+  /{udid}/paired:
+    get:
+      description: Returns whether the device is paired
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Check pairing status
+      tags:
+      - pairing
+  /{udid}/processes:
+    get:
+      description: Returns a list of running processes on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: List processes
+      tags:
+      - device
+  /{udid}/profiles/add:
+    post:
+      consumes:
+      - application/json
+      description: Installs a configuration profile on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      - description: Base64 encoded profile
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/main.ProfilleAddRequset'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add profile
+      tags:
+      - profiles
+  /{udid}/profiles/list:
+    get:
+      description: Returns a list of configuration profiles installed on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: List profiles
+      tags:
+      - profiles
+  /{udid}/reboot:
+    post:
+      description: Reboots the specified iOS device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Reboot device
+      tags:
+      - device
+  /{udid}/supervise/enable:
+    post:
+      description: Prepares and enables supervision on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Enable supervision
+      tags:
+      - supervision
+  /{udid}/supervised:
+    get:
+      description: Returns whether the device is supervised
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Check supervision status
+      tags:
+      - supervision
+  /{udid}/wda/kill:
+    post:
+      description: Stops WebDriverAgent on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Kill WebDriverAgent
+      tags:
+      - wda
+  /{udid}/wda/run:
+    post:
+      description: Starts WebDriverAgent on the device
+      parameters:
+      - description: Device UDID
+        in: path
+        name: udid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.GenericResponse'
+      summary: Run WebDriverAgent
+      tags:
+      - wda
+swagger: "2.0"
