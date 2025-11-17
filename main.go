@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"runtime/debug"
@@ -94,9 +96,9 @@ func deviceMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func writeResponse(w http.ResponseWriter, data []byte) {
+func writeResponse(w http.ResponseWriter, status int, data []byte) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(status)
 	w.Write(data)
 }
 
@@ -109,7 +111,7 @@ func writeResponse(w http.ResponseWriter, data []byte) {
 // @Router       /devices [get]
 func devices(w http.ResponseWriter, _ *http.Request) {
 	devices := []byte(tiny.DeviceList())
-	w.Write(devices)
+	writeResponse(w, 200, devices)
 }
 
 // reboot godoc
@@ -123,7 +125,7 @@ func devices(w http.ResponseWriter, _ *http.Request) {
 func reboot(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Reboot(d))
-	writeResponse(w, result)
+	writeResponse(w, 200, result)
 }
 
 // activated godoc
@@ -137,7 +139,7 @@ func reboot(w http.ResponseWriter, r *http.Request) {
 func activated(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Activated(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // activateEnable godoc
@@ -151,7 +153,7 @@ func activated(w http.ResponseWriter, r *http.Request) {
 func activateEnable(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.ActivateEnable(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // supervised godoc
@@ -165,7 +167,7 @@ func activateEnable(w http.ResponseWriter, r *http.Request) {
 func supervised(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Supervised(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // superviseEnable godoc
@@ -179,7 +181,7 @@ func supervised(w http.ResponseWriter, r *http.Request) {
 func superviseEnable(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Prepare(d, cder, "tinyios", "en-US", "en"))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // erase godoc
@@ -193,7 +195,7 @@ func superviseEnable(w http.ResponseWriter, r *http.Request) {
 func erase(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Erase(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // paired godoc
@@ -207,7 +209,7 @@ func erase(w http.ResponseWriter, r *http.Request) {
 func paired(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Paired(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // pairEnable godoc
@@ -221,7 +223,7 @@ func paired(w http.ResponseWriter, r *http.Request) {
 func pairEnable(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.PairEnable(d, p12))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // devmode godoc
@@ -235,7 +237,7 @@ func pairEnable(w http.ResponseWriter, r *http.Request) {
 func devmode(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Devmode(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // devmodeEnable godoc
@@ -249,7 +251,7 @@ func devmode(w http.ResponseWriter, r *http.Request) {
 func devmodeEnable(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.DevmodeEnable(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // image godoc
@@ -263,7 +265,7 @@ func devmodeEnable(w http.ResponseWriter, r *http.Request) {
 func image(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Image(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // imageEnable godoc
@@ -277,7 +279,7 @@ func image(w http.ResponseWriter, r *http.Request) {
 func imageEnable(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.ImageEnable(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // profileList godoc
@@ -291,10 +293,10 @@ func imageEnable(w http.ResponseWriter, r *http.Request) {
 func profileList(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.ProfileList(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
-type ProfilleAddRequset struct {
+type ProfileAddRequest struct {
 	B64Profile string `json:"b64profile"`
 }
 
@@ -305,42 +307,28 @@ type ProfilleAddRequset struct {
 // @Accept       json
 // @Produce      json
 // @Param        udid   path      string  true  "Device UDID"
-// @Param        profile body ProfilleAddRequset true "Base64 encoded profile"
-// @Success      201 {object} map[string]string
+// @Param        profile body ProfileAddRequest true "Base64 encoded profile"
+// @Success      200 {object} GenericResponse
+// @Failure      400 {string} string "invalid JSON"
 // @Router       /{udid}/profiles/add [post]
 func profileAdd(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 
 	// Decode JSON
-	var u ProfilleAddRequset
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields() // catch unwanted fields
-
-	if err := decoder.Decode(&u); err != nil {
+	var u ProfileAddRequest
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Optional: ensure no extra JSON after the first object
-	if decoder.More() {
-		http.Error(w, "invalid JSON: multiple objects", http.StatusBadRequest)
+	data, err := base64.StdEncoding.DecodeString(u.B64Profile)
+	if err != nil {
+		http.Error(w, "invalid base64 profile: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Do something with u (e.g., save to DB)
-	log.Printf("Got user: %+v\n", u)
-
-	// Return a response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	resp := map[string]string{"status": "ok"}
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		log.Printf("error writing response: %v", err)
-	}
-
-	result := []byte(tiny.ProfileAdd(d, []byte(r.FormValue("b64profile")), p12))
-	w.Write(result)
+	result := []byte(tiny.ProfileAdd(d, data, p12))
+	writeResponse(w, 200, result)
 }
 
 // appList godoc
@@ -354,7 +342,7 @@ func profileAdd(w http.ResponseWriter, r *http.Request) {
 func appList(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.AppList(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // appRun godoc
@@ -369,22 +357,35 @@ func appList(w http.ResponseWriter, r *http.Request) {
 func appRun(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.AppRun(d, r.FormValue("bundleid")))
-	w.Write(result)
+	writeResponse(w, 200, result)
+}
+
+type AppInstallRequest struct {
+	URL string `json:"url"`
 }
 
 // appInstall godoc
 // @Summary      Install application
 // @Description  Installs an application from a URL on the device
 // @Tags         apps
+// @Accept       json
 // @Produce      json
 // @Param        udid   path      string  true  "Device UDID"
-// @Param        url formData string true "Application IPA URL"
+// @Param        request body AppInstallRequest true "Application IPA URL"
 // @Success      200 {object} GenericResponse
+// @Failure      400 {string} string "invalid JSON"
 // @Router       /{udid}/apps/install [post]
 func appInstall(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
-	result := []byte(tiny.AppInstall(d, r.FormValue("url")))
-	w.Write(result)
+
+	var u AppInstallRequest
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result := []byte(tiny.AppInstall(d, u.URL))
+	writeResponse(w, 200, result)
 }
 
 // appKill godoc
@@ -399,7 +400,7 @@ func appInstall(w http.ResponseWriter, r *http.Request) {
 func appKill(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.AppKill(d, r.FormValue("pid")))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // processes godoc
@@ -413,7 +414,7 @@ func appKill(w http.ResponseWriter, r *http.Request) {
 func processes(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.Processes(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // wdaRun godoc
@@ -427,7 +428,7 @@ func processes(w http.ResponseWriter, r *http.Request) {
 func wdaRun(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.WdaRun(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 // wdaKill godoc
@@ -441,7 +442,7 @@ func wdaRun(w http.ResponseWriter, r *http.Request) {
 func wdaKill(w http.ResponseWriter, r *http.Request) {
 	d, _ := getDevice(r.Context())
 	result := []byte(tiny.WdaKill(d))
-	w.Write(result)
+	writeResponse(w, 200, result)
 }
 
 func RecoveryMiddleware(next http.Handler) http.Handler {
@@ -457,6 +458,19 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+	proxyUrl := os.Getenv("HTTP_PROXY")
+	if os.Getenv("HTTPS_PROXY") != "" {
+		proxyUrl = os.Getenv("HTTPS_PROXY")
+	}
+
+	if proxyUrl != "" {
+		parsedUrl, err := url.Parse(proxyUrl)
+		if err != nil {
+			log.Fatalf("could not parse proxy url %s: %v", proxyUrl, err)
+		}
+		http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(parsedUrl)}
+	}
+
 	root := http.NewServeMux()
 	root.HandleFunc("GET /devices", devices)
 

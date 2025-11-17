@@ -125,245 +125,6 @@ The main purpose of tinyios is to setup ios devices and then talk to them via ap
 
 | Method  | URI     | Name   | Summary |
 |---------|---------|--------|---------|
-| GET | /{udid}/processes | [get udid processes](#get-udid-processes) | List processes |
-| POST | /{udid}/erase | [post udid erase](#post-udid-erase) | Erase device |
-| POST | /{udid}/reboot | [post udid reboot](#post-udid-reboot) | Reboot device |
-  
-
-
-###  pairing
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/paired | [get udid paired](#get-udid-paired) | Check pairing status |
-| POST | /{udid}/pair/enable | [post udid pair enable](#post-udid-pair-enable) | Enable pairing |
-  
-
-
-###  profiles
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/profiles/list | [get udid profiles list](#get-udid-profiles-list) | List profiles |
-| POST | /{udid}/profiles/add | [post udid profiles add](#post-udid-profiles-add) | Add profile |
-  
-
-
-###  supervision
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/supervised | [get udid supervised](#get-udid-supervised) | Check supervision status |
-| POST | /{udid}/supervise/enable | [post udid supervise enable](#post-udid-supervise-enable) | Enable supervision |
-  
-
-
-###  wda
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| POST | /{udid}/wda/kill | [post udid wda kill](#post-udid-wda-kill) | Kill WebDriverAgent |
-| POST | /{udid}/wda/run | [post udid wda run](#post-udid-wda-run) | Run WebDriverAgent |
-  
-
-
-## Paths
-
-### <span id="get-udid-activated"></span> Check activation status (*GetUdidActivated*)
-
-```
-GET /{udid}/activated
-```
-
-Returns whether the device is activated
-
-#### Produces
-  * application/json
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-udid-activated-200) | OK | OK |  | [schema](#get-udid-activated-200-schema) |
-
-#### Responses
-
-
-##### <span id="get-udid-activated-200"></span> 200 - OK
-Status: OK
-
-###### <span id="get-udid-activated-200-schema"></span> Schema
-   
-  
-
-[MainGenericResponse](#main-generic-response)
-
-### <span id="get-udid-apps-list"></span> List applications (*GetUdidAppsList*)
-
-```
-GET /{udid}/apps/list
-```
-
-Returns a list of applications installed on the device
-
-#### Produces
-  * application/json
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-udid-apps-list-200) | OK | OK |  | [schema](#get-udid-apps-list-200-schema) |
-
-#### Responses
-
-
-##### <span id="get-udid-apps-list-200"></span> 200 - OK
-Status: OK
-
-###### <span id="get-udid-apps-list-200-schema"></span> Schema
-   
-  
-
-[MainGenericResponse](#main-generic-response)
-
-### <span id="get-udid-devmode"></span> Check developer mode status (*GetUdidDevmode*)
-
-```
-GET /{udid}/devmode
-```
-
-Returns whether developer mode is enabled on the device
-
-#### Produces
-  * application/json
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-udid-devmode-200) | OK | OK |  | [schema](#get-udid-devmode-200-schema) |
-
-#### Responses
-
-
-##### <span id="get-udid-devmode-200"></span> 200 - OK
-Status: OK
-
-###### <span id="get-udid-devmode-200-schema"></span> Schema
-   
-  
-
-[MainGenericResponse](#main-generic-response)
-
-### <span id="get-udid-image"></span> Check developer disk image status (*GetUdidImage*)
-
-```
-GET /{udid}/image
-```
-
-Returns whether the developer disk image is mounted
-
-#### Produces
-  * application/json
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-udid-image-200) | OK | OK |  | [schema](#get-udid-image-200-schema) |
-
-#### Responses
-
-
-##### <span id="get-udid-image-200"></span> 200 - OK
-Status: OK
-
-###### <span id="get-udid-image-200-schema"></span> Schema
-   
-  
-
-[MainGenericResponse](#main-generic-response)
-
-### <span id="get-udid-paired"></span> Check pairing status (*GetUdidPaired*)
-
-```
-GET /{udid}/paired
-```
-
-Returns whether the device is paired
-
-#### Produces
-  * application/json
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-udid-paired-200) | OK | OK |  | [schema](#get-udid-paired-200-schema) |
-
-## All endpoints
-
-###  activation
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/activated | [get udid activated](#get-udid-activated) | Check activation status |
-| POST | /{udid}/activate/enable | [post udid activate enable](#post-udid-activate-enable) | Enable activation |
-  
-
-
-###  apps
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/apps/list | [get udid apps list](#get-udid-apps-list) | List applications |
-| POST | /{udid}/apps/install | [post udid apps install](#post-udid-apps-install) | Install application |
-| POST | /{udid}/apps/kill | [post udid apps kill](#post-udid-apps-kill) | Kill application |
-| POST | /{udid}/apps/run | [post udid apps run](#post-udid-apps-run) | Run application |
-  
-
-
-###  developer
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /{udid}/devmode | [get udid devmode](#get-udid-devmode) | Check developer mode status |
-| GET | /{udid}/image | [get udid image](#get-udid-image) | Check developer disk image status |
-| POST | /{udid}/devmode/enable | [post udid devmode enable](#post-udid-devmode-enable) | Enable developer mode |
-| POST | /{udid}/image/enable | [post udid image enable](#post-udid-image-enable) | Mount developer disk image |
-  
-
-
-###  device
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
 | GET | /devices | [get devices](#get-devices) | List devices |
 | GET | /{udid}/processes | [get udid processes](#get-udid-processes) | List processes |
 | POST | /{udid}/erase | [post udid erase](#post-udid-erase) | Erase device |
@@ -751,6 +512,9 @@ POST /{udid}/apps/install
 
 Installs an application from a URL on the device
 
+#### Consumes
+  * application/json
+
 #### Produces
   * application/json
 
@@ -759,12 +523,13 @@ Installs an application from a URL on the device
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-| url | `formData` | string | `string` |  | ✓ |  | Application IPA URL |
+| request | `body` | [MainAppInstallRequest](#main-app-install-request) | `models.MainAppInstallRequest` | | ✓ | | Application IPA URL |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [200](#post-udid-apps-install-200) | OK | OK |  | [schema](#post-udid-apps-install-200-schema) |
+| [400](#post-udid-apps-install-400) | Bad Request | invalid JSON |  | [schema](#post-udid-apps-install-400-schema) |
 
 #### Responses
 
@@ -777,6 +542,15 @@ Status: OK
   
 
 [MainGenericResponse](#main-generic-response)
+
+##### <span id="post-udid-apps-install-400"></span> 400 - invalid JSON
+Status: Bad Request
+
+###### <span id="post-udid-apps-install-400-schema"></span> Schema
+   
+  
+
+
 
 ### <span id="post-udid-apps-kill"></span> Kill application (*PostUdidAppsKill*)
 
@@ -1003,24 +777,34 @@ Installs a configuration profile on the device
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | udid | `path` | string | `string` |  | ✓ |  | Device UDID |
-| profile | `body` | [MainProfilleAddRequset](#main-profille-add-requset) | `models.MainProfilleAddRequset` | | ✓ | | Base64 encoded profile |
+| profile | `body` | [MainProfileAddRequest](#main-profile-add-request) | `models.MainProfileAddRequest` | | ✓ | | Base64 encoded profile |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
-| [201](#post-udid-profiles-add-201) | Created | Created |  | [schema](#post-udid-profiles-add-201-schema) |
+| [200](#post-udid-profiles-add-200) | OK | OK |  | [schema](#post-udid-profiles-add-200-schema) |
+| [400](#post-udid-profiles-add-400) | Bad Request | invalid JSON |  | [schema](#post-udid-profiles-add-400-schema) |
 
 #### Responses
 
 
-##### <span id="post-udid-profiles-add-201"></span> 201 - Created
-Status: Created
+##### <span id="post-udid-profiles-add-200"></span> 200 - OK
+Status: OK
 
-###### <span id="post-udid-profiles-add-201-schema"></span> Schema
+###### <span id="post-udid-profiles-add-200-schema"></span> Schema
    
   
 
-map of string
+[MainGenericResponse](#main-generic-response)
+
+##### <span id="post-udid-profiles-add-400"></span> 400 - invalid JSON
+Status: Bad Request
+
+###### <span id="post-udid-profiles-add-400-schema"></span> Schema
+   
+  
+
+
 
 ### <span id="post-udid-reboot"></span> Reboot device (*PostUdidReboot*)
 
@@ -1160,6 +944,21 @@ Status: OK
 
 ## Models
 
+### <span id="main-app-install-request"></span> main.AppInstallRequest
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| url | string| `string` |  | |  |  |
+
+
+
 ### <span id="main-device"></span> main.Device
 
 
@@ -1209,7 +1008,7 @@ Status: OK
 
 
 
-### <span id="main-profille-add-requset"></span> main.ProfilleAddRequset
+### <span id="main-profile-add-request"></span> main.ProfileAddRequest
 
 
   
