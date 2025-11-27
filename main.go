@@ -1,16 +1,20 @@
 package main
 
 import (
+	"archive/zip"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	_ "embed"
@@ -18,6 +22,14 @@ import (
 	"github.com/danielpaulus/go-ios/ios"
 	"github.com/danielpaulus/go-ios/ios/tiny"
 )
+
+func convertToJSONString(data interface{}) string {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return ""
+	}
+	return string(b)
+}
 
 // @title           tinyios
 // @version         0.0.1
@@ -360,6 +372,115 @@ func appRun(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, 200, result)
 }
 
+// downloadFromPresignedURL downloads the content from presignedURL into destPath.
+func downloadFromPresignedURL(presignedURL, destPath string) error {
+	resp, err := http.Get(presignedURL)
+	if err != nil {
+		return fmt.Errorf("failed to GET from presigned URL: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status code: %d %s", resp.StatusCode, resp.Status)
+	}
+
+	outFile, err := os.Create(destPath)
+	if err != nil {
+		return fmt.Errorf("failed to create file %q: %w", destPath, err)
+	}
+	defer outFile.Close()
+
+	if _, err := io.Copy(outFile, resp.Body); err != nil {
+		return fmt.Errorf("failed to copy response body to file: %w", err)
+	}
+
+	return nil
+}
+
+// unzip extracts a zip archive to destDir, taking care to avoid ZipSlip.
+func unzip(zipPath, destDir string) error {
+	r, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return fmt.Errorf("failed to open zip: %w", err)
+	}
+	defer r.Close()
+
+	// Normalize destination directory to an absolute, cleaned path
+	destDir, err = filepath.Abs(destDir)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path for destDir: %w", err)
+	}
+
+	for _, f := range r.File {
+		// Build the full path under destDir
+		fpath := filepath.Join(destDir, f.Name)
+
+		// Prevent ZipSlip by ensuring fpath is still under destDir
+		if !strings.HasPrefix(fpath, destDir+string(os.PathSeparator)) {
+			return fmt.Errorf("illegal file path: %s", fpath)
+		}
+
+		if f.FileInfo().IsDir() {
+			// Create directory
+			if err := os.MkdirAll(fpath, os.ModePerm); err != nil {
+				return fmt.Errorf("failed to create directory %q: %w", fpath, err)
+			}
+			continue
+		}
+
+		// Ensure parent directory exists
+		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+			return fmt.Errorf("failed to create directory %q: %w", filepath.Dir(fpath), err)
+		}
+
+		// Open file inside the zip
+		rc, err := f.Open()
+		if err != nil {
+			return fmt.Errorf("failed to open file in zip %q: %w", f.Name, err)
+		}
+
+		// Create destination file with same mode
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			rc.Close()
+			return fmt.Errorf("failed to create file %q: %w", fpath, err)
+		}
+
+		// Copy contents
+		if _, err := io.Copy(outFile, rc); err != nil {
+			outFile.Close()
+			rc.Close()
+			return fmt.Errorf("failed to copy file contents to %q: %w", fpath, err)
+		}
+
+		outFile.Close()
+		rc.Close()
+	}
+
+	return nil
+}
+
+func appInstallWithURL(url string, d ios.DeviceEntry) string {
+	presignedURL := url                            // TODO: replace with your URL
+	zipPath := d.Properties.SerialNumber + ".zip"  // where to save the downloaded zip
+	extractDir := "./" + d.Properties.SerialNumber // where to unzip; current dir is fine
+
+	// 1. Download the zip file
+	if err := downloadFromPresignedURL(presignedURL, zipPath); err != nil {
+		return convertToJSONString(map[string]bool{"ok": false})
+	}
+	fmt.Println("Downloaded zip to", zipPath)
+
+	// 2. Unzip it (this will create the .app bundle in extractDir if it's inside the zip)
+	if err := unzip(zipPath, extractDir); err != nil {
+		return convertToJSONString(map[string]bool{"ok": false})
+	}
+	fmt.Println("Unzipped to", extractDir)
+
+	wdaPath := d.Properties.SerialNumber + "/WebDriverAgentRunner-Runner.app"
+	return tiny.AppInstall(d, wdaPath)
+}
+
 type AppInstallRequest struct {
 	URL string `json:"url"`
 }
@@ -384,7 +505,7 @@ func appInstall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := []byte(tiny.AppInstall(d, u.URL))
+	result := []byte(appInstallWithURL(u.URL, d))
 	writeResponse(w, 200, result)
 }
 

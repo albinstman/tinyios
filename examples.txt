@@ -1,0 +1,7 @@
+go run main.go 
+
+http://localhost:8080/devices
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/run
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/kill
