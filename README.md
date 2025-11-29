@@ -35,7 +35,7 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
 3. Run latest container image on port 8080
     ```
     docker run —rm \
-    -p 8080:80 \
+    -p 8080:8080 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
     ```
@@ -61,7 +61,7 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
 2. Run latest container image on port 8080
     ```
     docker run —rm \
-    -p 8080:80 \
+    -p 8080:8080 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
     ```
@@ -76,7 +76,7 @@ tinyios depends on usbmuxd installed on the host machine to manage device pairin
 2. Run latest container image on port 8080
     ```
     docker run —rm \
-    -p 8080:80 \
+    -p 8080:8080 \
     -e USBMUXD_SOCKET_ADDRESS=host.docker.internal:27015 \
     albinstman/tinyios
     ```
