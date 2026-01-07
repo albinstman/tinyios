@@ -1,7 +1,97 @@
 go run main.go 
 
-http://localhost:8080/devices
+
+DEVIVCES
+
+curl http://localhost:8080/devices
+
+-------------------------
+
+REBOOT 
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/reboot
+
+-------------------------
+
+ACTIVATE
+
+curl http://localhost:8080/00008110-00140532349B801E/activated
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/activate/enable
+
+-------------------------
+
+SUPERVISED
+
+curl http://localhost:8080/00008110-00140532349B801E/supervised
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/supervise/enable
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/erase
+
+-------------------------
+
+PAIRING
+
+curl http://localhost:8080/00008110-00140532349B801E/paired
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/pair/enable
+
+-------------------------
+
+DEVMODE
+
+curl http://localhost:8080/00008110-00140532349B801E/devmode
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/devmode/enable
+
+-------------------------
+
+IMAGE 
+
+curl http://localhost:8080/00008110-00140532349B801E/image
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/image/enable
+
+-------------------------
+
+PROFILES
+
+curl http://localhost:8080/00008110-00140532349B801E/profiles/list
+
+curl -X POST \
+  http://localhost:8080/00008110-00140532349B801E/profiles/http \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "192.168.2.1",
+    "port": "8080"
+  }'
+
+-------------------------
+
+APPS
+
+curl http://localhost:8080/00008110-00140532349B801E/apps/list
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/apps/run
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/apps/install
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/apps/kill
+
+-------------------------
+
+PROCESSES 
+
+curl http://localhost:8080/00008110-00140532349B801E/processes
+
+WDA 
 
 curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/run
 
 curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/kill
+
+-------------------------
+
+
+ios httpproxy 192.168.1.188 8080 --p12file=c.p12 --password=a

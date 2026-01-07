@@ -6,7 +6,7 @@ import (
 	"io"
 
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/crypto/pkcs12"
+	"software.sslmate.com/src/go-pkcs12"
 
 	ios "github.com/danielpaulus/go-ios/ios"
 )

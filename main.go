@@ -53,7 +53,6 @@ type Device struct {
 	ProductName    string `json:"ProductName"`
 	ProductType    string `json:"ProductType"`
 	ProductVersion string `json:"ProductVersion"`
-	ConnectionType string `json:"ConnectionType"`
 }
 
 type deviceCtxKey string
@@ -343,6 +342,34 @@ func profileAdd(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, 200, result)
 }
 
+type ProfileHttpRequest struct {
+	Address string `json:"address"`
+	Port    string `json:"port"`
+}
+
+// profileHttp godoc
+// @Summary      Set global HTTP proxy
+// @Description  Configures the device to use an HTTP proxy for profile installation
+// @Tags         profiles
+// @Accept       json
+// @Produce      json
+// @Param        udid   path      string  true  "Device UDID"
+// @Param        request body ProfileHttpRequest true "HTTP proxy configuration"
+// @Success      200 {object} GenericResponse
+// @Failure      400 {string} string "invalid JSON"
+// @Router       /{udid}/profiles/http [post]
+func profileHttp(w http.ResponseWriter, r *http.Request) {
+	d, _ := getDevice(r.Context())
+	var u ProfileHttpRequest
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		http.Error(w, "invalid JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	fmt.Printf("Setting HTTP proxy to %s:%s\n", u.Address, u.Port)
+	result := []byte(tiny.ProfileHttp(d, u.Address, u.Port, p12))
+	writeResponse(w, 200, result)
+}
+
 // appList godoc
 // @Summary      List applications
 // @Description  Returns a list of applications installed on the device
@@ -597,24 +624,34 @@ func main() {
 
 	deviceMux := http.NewServeMux()
 	deviceMux.HandleFunc("POST /{udid}/reboot", reboot)
+
 	deviceMux.HandleFunc("GET /{udid}/activated", activated)
 	deviceMux.HandleFunc("POST /{udid}/activate/enable", activateEnable)
+
 	deviceMux.HandleFunc("GET /{udid}/supervised", supervised)
 	deviceMux.HandleFunc("POST /{udid}/supervise/enable", superviseEnable)
 	deviceMux.HandleFunc("POST /{udid}/erase", erase)
+
 	deviceMux.HandleFunc("GET /{udid}/paired", paired)
 	deviceMux.HandleFunc("POST /{udid}/pair/enable", pairEnable)
+
 	deviceMux.HandleFunc("GET /{udid}/devmode", devmode)
 	deviceMux.HandleFunc("POST /{udid}/devmode/enable", devmodeEnable)
+
 	deviceMux.HandleFunc("GET /{udid}/image", image)
 	deviceMux.HandleFunc("POST /{udid}/image/enable", imageEnable)
+
 	deviceMux.HandleFunc("GET /{udid}/profiles/list", profileList)
 	deviceMux.HandleFunc("POST /{udid}/profiles/add", profileAdd)
+	deviceMux.HandleFunc("POST /{udid}/profiles/http", profileHttp)
+
 	deviceMux.HandleFunc("GET /{udid}/apps/list", appList)
 	deviceMux.HandleFunc("POST /{udid}/apps/run", appRun)
 	deviceMux.HandleFunc("POST /{udid}/apps/install", appInstall)
 	deviceMux.HandleFunc("POST /{udid}/apps/kill", appKill)
+
 	deviceMux.HandleFunc("GET /{udid}/processes", processes)
+
 	deviceMux.HandleFunc("POST /{udid}/wda/run", wdaRun)
 	deviceMux.HandleFunc("POST /{udid}/wda/kill", wdaKill)
 

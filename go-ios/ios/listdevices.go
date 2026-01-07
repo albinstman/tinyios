@@ -124,7 +124,6 @@ type detailsEntry struct {
 	ProductName    string
 	ProductType    string
 	ProductVersion string
-	ConnectionType string
 }
 
 func DetailedList() (string, error) {
@@ -137,17 +136,18 @@ func DetailedList() (string, error) {
 		udid := device.Properties.SerialNumber
 		allValues, err := GetValues(device)
 		if err != nil {
-			return "", fmt.Errorf("failed getting values: %w", err)
+			result[i] = detailsEntry{
+				Udid: udid,
+			}
+			continue
 		}
 		result[i] = detailsEntry{
 			udid,
 			allValues.Value.ProductName,
 			allValues.Value.ProductType,
 			allValues.Value.ProductVersion,
-			device.Properties.ConnectionType,
 		}
 	}
-
 	return convertToJSONString(map[string][]detailsEntry{
 		"devices": result,
 	}), nil

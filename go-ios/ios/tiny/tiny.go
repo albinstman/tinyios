@@ -200,6 +200,14 @@ func ProfileAdd(device ios.DeviceEntry, profileData []byte, p12 []byte) string {
 	return convertToJSONString(map[string]bool{"ok": true})
 }
 
+func ProfileHttp(device ios.DeviceEntry, address string, port string, p12 []byte) string {
+	err := mcinstall.SetHttpProxy(device, address, port, "", "", p12, "a")
+	if err != nil {
+		return convertToJSONString(map[string]bool{"ok": false})
+	}
+	return convertToJSONString(map[string]bool{"ok": true})
+}
+
 func AppList(device ios.DeviceEntry) string {
 	svc, err := installationproxy.New(device)
 	if err != nil {
@@ -372,6 +380,8 @@ func WdaRun(device ios.DeviceEntry) string {
 	}()
 
 	globalSessions.Store(device.Properties.SerialNumber, session)
+
+	fmt.Print("Starting WDA...\n")
 
 	return convertToJSONString(map[string]bool{"ok": true})
 }
