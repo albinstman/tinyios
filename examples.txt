@@ -1,9 +1,13 @@
-go run main.go 
-
 
 DEVIVCES
 
 curl http://localhost:8080/devices
+
+-------------------------
+
+ERASE 
+
+curl -X POST http://localhost:8080/00008110-00140532349B801E/erase
 
 -------------------------
 
@@ -26,8 +30,6 @@ SUPERVISED
 curl http://localhost:8080/00008110-00140532349B801E/supervised
 
 curl -X POST http://localhost:8080/00008110-00140532349B801E/supervise/enable
-
-curl -X POST http://localhost:8080/00008110-00140532349B801E/erase
 
 -------------------------
 
@@ -85,6 +87,8 @@ PROCESSES
 
 curl http://localhost:8080/00008110-00140532349B801E/processes
 
+-------------------------
+
 WDA 
 
 curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/run
@@ -92,6 +96,3 @@ curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/run
 curl -X POST http://localhost:8080/00008110-00140532349B801E/wda/kill
 
 -------------------------
-
-
-ios httpproxy 192.168.1.188 8080 --p12file=c.p12 --password=a

@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"os/signal"
@@ -605,6 +607,28 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func stripUDIDAndWDACmd(r *http.Request) string {
+	udid := r.PathValue("udid")
+	if udid == "" {
+		return r.URL.Path
+	}
+
+	prefix := "/" + udid + "/wda/cmd"
+	rest := strings.TrimPrefix(r.URL.Path, prefix)
+
+	// Normalize:
+	// "/{udid}/wda/cmd"        -> "/"
+	// "/{udid}/wda/cmd/"       -> "/"
+	// "/{udid}/wda/cmd/status" -> "/status"
+	if rest == "" || rest == "/" {
+		return "/"
+	}
+	if !strings.HasPrefix(rest, "/") {
+		rest = "/" + rest
+	}
+	return rest
+}
+
 func main() {
 	proxyUrl := os.Getenv("HTTP_PROXY")
 	if os.Getenv("HTTPS_PROXY") != "" {
@@ -654,6 +678,51 @@ func main() {
 
 	deviceMux.HandleFunc("POST /{udid}/wda/run", wdaRun)
 	deviceMux.HandleFunc("POST /{udid}/wda/kill", wdaKill)
+
+	transport := &http.Transport{
+		// IMPORTANT: DialContext receives the request context.
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			d, _ := getDevice(ctx)
+			conn, err := tiny.WdaConnection(d)
+			return conn, err
+		},
+
+		// Keep-alive / pooling knobs (tune to your needs)
+		MaxIdleConns:        200,
+		MaxIdleConnsPerHost: 50,
+		IdleConnTimeout:     90 * time.Second,
+
+		// If you do NOT want http2 surprises with custom conns:
+		ForceAttemptHTTP2: false,
+	}
+
+	rproxy := &httputil.ReverseProxy{
+		Transport: transport,
+		Director: func(r *http.Request) {
+			d, _ := getDevice(r.Context())
+
+			// Pool key: use a stable synthetic host per udid.
+			// All requests for same udid will share a pool.
+			r.URL.Scheme = "http"
+			r.URL.Host = "udid-" + d.Properties.SerialNumber
+			r.Host = r.URL.Host
+
+			// Strip "/{udid}" prefix
+			r.URL.Path = stripUDIDAndWDACmd(r)
+			r.URL.RawPath = ""
+		},
+		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
+			http.Error(w, "bad gateway: "+err.Error(), http.StatusBadGateway)
+		},
+	}
+
+	deviceMux.HandleFunc("/{udid}/wda/cmd/", func(w http.ResponseWriter, r *http.Request) {
+		rproxy.ServeHTTP(w, r)
+	})
+
+	deviceMux.HandleFunc("/{udid}/wda/cmd", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, r.URL.Path+"/", http.StatusPermanentRedirect)
+	})
 
 	root.Handle("/{udid}/", deviceMiddleware(deviceMux))
 

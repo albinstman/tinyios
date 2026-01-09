@@ -405,6 +405,20 @@ func WdaKill(device ios.DeviceEntry) string {
 	return convertToJSONString(map[string]bool{"ok": true})
 }
 
+func WdaConnection(device ios.DeviceEntry) (net.Conn, error) {
+	usbmuxConn, err := ios.NewUsbMuxConnectionSimple()
+	if err != nil {
+		return nil, fmt.Errorf("could not connect to usbmuxd: %v", err)
+	}
+	muxError := usbmuxConn.Connect(device.DeviceID, 8100)
+	if muxError != nil {
+
+		return nil, fmt.Errorf("could not connect to port:%d on iOS: %v", 8100, err)
+	}
+	deviceConn := usbmuxConn.ReleaseDeviceConnection()
+	return deviceConn.Conn(), nil
+}
+
 func Forward(upstream, downstream net.Conn) error {
 	var (
 		g    errgroup.Group
