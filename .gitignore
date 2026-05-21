@@ -1,3 +1,6 @@
+# Personal Claude Code settings (shared settings.json is committed)
+.claude/settings.local.json
+
 # Compiled binaries from `go build`
 /tinyios
 /node
