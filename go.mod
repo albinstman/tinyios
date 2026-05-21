@@ -1,4 +1,4 @@
-module github.com/albinstman/tinystar/services/node
+module github.com/albinstman/tinyios
 
 go 1.25.1
 

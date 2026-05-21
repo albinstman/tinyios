@@ -595,6 +595,18 @@ func wdaKill(w http.ResponseWriter, r *http.Request) {
 	writeResponse(w, 200, result)
 }
 
+// wdaCmd godoc
+// @Summary      WebDriverAgent passthrough
+// @Description  Transparent reverse proxy to the WebDriverAgent HTTP server running on the device. Everything after /wda/cmd is forwarded verbatim to WDA, exposing its full WebDriver/Appium endpoint surface (for example /status, /session, element interactions). Sub-paths are proxied as-is.
+// @Tags         wda
+// @Param        udid   path      string  true  "Device UDID"
+// @Router       /{udid}/wda/cmd/ [any]
+func wdaCmd(rproxy *httputil.ReverseProxy) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rproxy.ServeHTTP(w, r)
+	}
+}
+
 func RecoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
@@ -716,9 +728,7 @@ func main() {
 		},
 	}
 
-	deviceMux.HandleFunc("/{udid}/wda/cmd/", func(w http.ResponseWriter, r *http.Request) {
-		rproxy.ServeHTTP(w, r)
-	})
+	deviceMux.HandleFunc("/{udid}/wda/cmd/", wdaCmd(rproxy))
 
 	deviceMux.HandleFunc("/{udid}/wda/cmd", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, r.URL.Path+"/", http.StatusPermanentRedirect)

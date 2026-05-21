@@ -1,0 +1,12 @@
+# Compiled binaries from `go build`
+/tinyios
+/node
+/gendocs
+
+# Go build/test output
+*.exe
+*.out
+*.test
+
+# App install scratch (downloaded zips / extracted .app bundles, named per device serial)
+*.zip
